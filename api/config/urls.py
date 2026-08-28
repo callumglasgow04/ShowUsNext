@@ -26,7 +26,7 @@ urlpatterns = [
 
     path("api/", include('api.urls')),
 
-    path("api/auth/token/", TokenObtainPairView.as_view()),
+    path("api/auth/login/", TokenObtainPairView.as_view()),
     path("api/auth/refresh/", TokenRefreshView.as_view()),
 
 ]

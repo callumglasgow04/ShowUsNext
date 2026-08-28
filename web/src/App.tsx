@@ -1,8 +1,9 @@
 import { ThemeProvider } from '@mui/material/styles'
-import { Box, CssBaseline, Typography } from '@mui/material'
+import { Box, CssBaseline } from '@mui/material'
 import { theme } from './theme/theme'
 import { Navbar } from './components/NavBar/Navbar'
 import { Home } from './pages/Home'
+import Login from './pages/Login/Login'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
 
       <Box component="main">
         <Home/>
+        <Login />
       </Box>
     </ThemeProvider>
   )
