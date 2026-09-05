@@ -1,15 +1,17 @@
 import React from "react";
-import { AppBar, Button, Box, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Box, Toolbar, Typography, Stack } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Link } from "react-router-dom";
 import { useAuth } from "../../features/auth/authContext";
+import { Login } from "@mui/icons-material";
+import { NavbarAccountDropDown } from "./NavbarAccountDropDown";
 
 export const Navbar = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     return (
         <AppBar
             position="static"
-            sx={{ backgroundColor: '#161B22'}}
+            sx={{ backgroundColor: '#161B22' }}
         >
             <Toolbar sx={{ gap: 2 }}>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -17,10 +19,15 @@ export const Navbar = () => {
                 </Typography>
 
                 <Box sx={{ display: "flex", gap: 8 }}>
-                    <Button color="inherit">Home</Button>
+                    <Button color="inherit" component={Link} to="/" >Home</Button>
                     <Button color="inherit">Discover</Button>
-                    <Button onClick={logout} color="inherit">Logout</Button>
-                    <Button color="inherit" component={Link} to="/login" ><AccountBoxIcon /></Button>
+                    {user == null ? (
+                        <Button color="inherit" component={Link} to="/login" ><Login /></Button>
+                    ) : (
+                        <Stack>
+                            <NavbarAccountDropDown />
+                        </Stack>
+                    )}
                 </Box>
 
             </Toolbar>

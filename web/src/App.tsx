@@ -15,7 +15,13 @@ function isAuthed() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  return isAuthed() ? children : <Navigate to="/login" replace />;
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>
 }
 
 function LoggedInRedirect({ children }: { children: JSX.Element }) {
