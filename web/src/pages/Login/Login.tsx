@@ -1,6 +1,17 @@
-import { Box, Stack, TextField, Typography, Button, Alert } from "@mui/material";
-import api, { setAccessToken } from "../../lib/apiClient";
+import {
+  Alert,
+  Box,
+  Button,
+  Link as MuiLink,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import api, { setAccessToken } from "../../lib/apiClient";
+import { fetchMe } from "../../features/auth/authApi";
+import { useAuth } from "../../features/auth/authContext";
 
 export async function attemptLogin(username: string, password: string) {
     const { data } = await api.post("/auth/login/", {
@@ -17,6 +28,8 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const navigate = useNavigate();
+    const { setUser } = useAuth(); 
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -28,6 +41,9 @@ export default function Login() {
             const user = await attemptLogin(email, password);
             setSuccess(`Welcome ${user?.email ?? "back"}!`);
 
+            const me = await fetchMe();
+            setUser(me);
+            navigate("/");
         } catch (err: any) {
             setError(err?.response?.data?.message || "Login failed");
         } finally {
@@ -68,6 +84,10 @@ export default function Login() {
                     <Button type="submit" variant="contained" disabled={loading}>
                         {loading ? "Logging in..." : "Login"}
                     </Button>
+
+                    <MuiLink component={RouterLink} to="/register" underline="hover" sx={{ textAlign: "center", display: "block", mt: 1 }} >
+                        Register Here
+                    </MuiLink>
                 </Stack>
             </form>
         </Box>
