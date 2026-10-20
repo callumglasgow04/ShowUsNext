@@ -1,23 +1,23 @@
 import {
-  Alert,
-  Box,
-  Button,
-  Link as MuiLink,
-  Stack,
-  TextField,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Link as MuiLink,
+    Stack,
+    TextField,
+    Typography,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../lib/apiClient";
 
-export async function attemptRegister(email: string, password: string, password2: string, firstName: string, lastName: string) {
+export async function attemptRegister(email: string, password: string, password2: string, first_name: string, last_name: string) {
     const { data } = await api.post("/auth/register/", {
         email,
         password,
         password2,
-        firstName,
-        lastName,
+        first_name,
+        last_name,
     });
     return data;
 }
@@ -33,18 +33,32 @@ export default function Register() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+    const navigate = useNavigate();
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
         setSuccess("");
+        setPasswordErrors([]);
         setLoading(true);
 
         try {
-            const user = await attemptRegister(email, password, password2, firstName, lastName);
-            setSuccess(`Welcome ${user?.firstName ?? "back"}!`);
+            await attemptRegister(email, password, password2, firstName, lastName);
+            setSuccess("Registration Successful!");
+            navigate("/login");
 
         } catch (err: any) {
-            setError(err?.response?.data?.message || "Register failed");
+            const data = err?.response?.data;
+            setPasswordErrors(data?.password ?? []);
+            const messages = [];
+
+            if (data?.email) {
+                messages.push(Array.isArray(data.email) ? data.email.join(" ") : data.email);
+            }
+            if (data?.password) messages.push("Invalid password");
+
+            setError(messages.join(" and ") || "Register failed");
         } finally {
             setLoading(false);
         }
@@ -79,6 +93,14 @@ export default function Register() {
                         required
                         fullWidth
                     />
+
+                    {passwordErrors.length > 0 && (
+                        <Box component="ul" sx={{ mt: 0, mb: 0, pl: 3 }}>
+                            {passwordErrors.map((message, index) => (
+                                <li key={index}>{message}</li>
+                            ))}
+                        </Box>
+                    )}
 
                     <TextField
                         label="confirmPassword"
