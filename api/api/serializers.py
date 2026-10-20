@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+from .models import ShowList, ShowListItem
+
 
 User = get_user_model()
 
@@ -35,3 +37,26 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name = validated_data.get("last_name", ""),
         )
         return user
+
+class ShowListItemSerializer(serializers.ModelSerializer):
+    tmdb_id = serializers.IntegerField(min_value=1)
+
+    class Meta:
+        model = ShowListItem
+        fields = ["id", "tmdb_id", "added_at"]
+        read_only_fields = ["id", "added_at"]
+
+
+class ShowListSerializer(serializers.ModelSerializer):
+    items = ShowListItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ShowList
+        fields = ["id", "name", "list_type", "created_at", "items"]
+        read_only_fields = ["id", "created_at"]
+
+    def validate_list_type(self, value):
+        user = self.context["request"].user
+        if value and ShowList.objects.filter(user=user, list_type=value).exists():
+            raise serializers.ValidationError("You already have a list of this type.")
+        return value

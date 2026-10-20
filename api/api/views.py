@@ -4,9 +4,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, ShowListSerializer, ShowListItemSerializer
 from .services import TMDBError, TMDBNotFound, get_show, search_shows
-
+from .models import ShowList, ShowListItem
+from django.shortcuts import get_object_or_404
 
 @api_view(["GET"])
 @permission_classes([permissions.AllowAny])
@@ -82,3 +83,53 @@ class ShowDetailView(APIView):
             cache.set(cache_key, result, SHOW_CACHE_SECONDS)
 
         return Response(result)
+
+class ShowListView(generics.ListCreateAPIView):
+    serializer_class = ShowListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ShowList.objects.filter(user=self.request.user).prefetch_related("items")
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ShowListDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = ShowListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ShowList.objects.filter(user=self.request.user).prefetch_related("items")
+
+
+class ShowListItemCreateView(generics.CreateAPIView):
+    serializer_class = ShowListItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, pk):
+        show_list = get_object_or_404(ShowList, pk=pk, user=request.user)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        item, created = ShowListItem.objects.get_or_create(
+            show_list=show_list, tmdb_id=serializer.validated_data["tmdb_id"]
+        )
+        return Response(
+            self.get_serializer(item).data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+class ShowListItemDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, pk, tmdb_id):
+        deleted, _ = ShowListItem.objects.filter(
+            show_list__pk=pk, show_list__user=request.user, tmdb_id=tmdb_id
+        ).delete()
+        if not deleted:
+            return Response(
+                {"detail": "Show not found in this list."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)

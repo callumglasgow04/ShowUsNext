@@ -1,15 +1,15 @@
 import {
-  Alert,
-  Box,
-  Button,
-  Link as MuiLink,
-  Stack,
-  TextField,
-  Typography,
+    Alert,
+    Box,
+    Button,
+    Link as MuiLink,
+    Stack,
+    TextField,
+    Typography,
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import api, { setAccessToken } from "../../lib/apiClient";
+import api from "../../lib/apiClient";
 import { fetchMe } from "../../features/auth/authApi";
 import { useAuth } from "../../features/auth/authContext";
 
@@ -18,7 +18,6 @@ export async function attemptLogin(username: string, password: string) {
         username,
         password,
     });
-    setAccessToken(data.access);
     return data;
 }
 
@@ -29,7 +28,7 @@ export default function Login() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const navigate = useNavigate();
-    const { setUser } = useAuth(); 
+    const { setUser } = useAuth();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -40,6 +39,8 @@ export default function Login() {
         try {
             const user = await attemptLogin(email, password);
             setSuccess(`Welcome ${user?.email ?? "back"}!`);
+            localStorage.setItem("access_token", user.access);
+            if (user.refresh) localStorage.setItem("refresh_token", user.refresh);
 
             const me = await fetchMe();
             setUser(me);
@@ -57,7 +58,7 @@ export default function Login() {
             mx: "auto",
             mt: 8,
         }}>
-            <Typography variant="h4" sx={{ mb: 3}}>Login</Typography>
+            <Typography variant="h4" sx={{ mb: 3 }}>Login</Typography>
 
             <form onSubmit={handleSubmit}>
                 <Stack spacing={2}>

@@ -20,6 +20,7 @@ export const Navbar = () => {
 
                 <Box sx={{ display: "flex", gap: 8 }}>
                     <Button color="inherit" component={Link} to="/" >Home</Button>
+                    <Button color="inherit" component={Link} to="/list/create" >Lists</Button>
                     <Button color="inherit">Discover</Button>
                     <NavbarSearch />
                     {user == null ? (

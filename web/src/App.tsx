@@ -10,6 +10,7 @@ import Account from './pages/Account/Account'
 import type { JSX } from '@emotion/react/jsx-runtime'
 import { useAuth } from './features/auth/authContext'
 import ShowDetails from './pages/ShowDetails/ShowDetails'
+import CreateListForm from './pages/Lists/CreateLists'
 
 function isAuthed() {
   return !!localStorage.getItem("access_token");
@@ -52,6 +53,7 @@ function App() {
           />
 
           <Route path="/shows/:showId" element={<ShowDetails />} />
+          <Route path="/list/create" element={<ProtectedRoute><CreateListForm /></ProtectedRoute>} />
           <Route path='/account' element={
             <ProtectedRoute>
               <Account />
