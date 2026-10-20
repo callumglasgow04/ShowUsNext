@@ -1,13 +1,13 @@
-import React from "react";
 import { AppBar, Button, Box, Toolbar, Typography, Stack } from "@mui/material";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { Link } from "react-router-dom";
 import { useAuth } from "../../features/auth/authContext";
 import { Login } from "@mui/icons-material";
 import { NavbarAccountDropDown } from "./NavbarAccountDropDown";
+import NavbarSearch from "./NavBarSearch";
 
 export const Navbar = () => {
-    const { logout, user } = useAuth();
+    const { user } = useAuth();
     return (
         <AppBar
             position="static"
@@ -21,6 +21,7 @@ export const Navbar = () => {
                 <Box sx={{ display: "flex", gap: 8 }}>
                     <Button color="inherit" component={Link} to="/" >Home</Button>
                     <Button color="inherit">Discover</Button>
+                    <NavbarSearch />
                     {user == null ? (
                         <Button color="inherit" component={Link} to="/login" ><Login /></Button>
                     ) : (
