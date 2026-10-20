@@ -11,7 +11,7 @@ import {
 import api from "../../lib/apiClient";
 
 type ShowResult = {
-    tvmaze_id: number;
+    tmdb_id: number;
     name: string;
     year: string | null;
     image: string | null;
@@ -73,7 +73,7 @@ export default function NavbarSearch() {
             inputValue={inputValue}
             filterOptions={(x) => x} // keep API order/results
             getOptionLabel={getLabel}
-            isOptionEqualToValue={(a, b) => a.tvmaze_id === b.tvmaze_id}
+            isOptionEqualToValue={(a, b) => a.tmdb_id === b.tmdb_id}
             onInputChange={(_, value, reason) => {
                 if (reason === "input" || reason === "clear") setInputValue(value);
             }}
@@ -81,7 +81,7 @@ export default function NavbarSearch() {
                 if (!selected) return;
                 setInputValue("");
                 setOptions([]);
-                navigate(`/shows/${selected.tvmaze_id}`);
+                navigate(`/shows/${selected.tmdb_id}`);
             }}
             noOptionsText={tooShort ? `Type ${MIN_CHARS}+ characters` : "No results"}
             renderInput={(params) => (

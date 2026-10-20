@@ -9,6 +9,7 @@ import Register from './pages/Register/Register'
 import Account from './pages/Account/Account'
 import type { JSX } from '@emotion/react/jsx-runtime'
 import { useAuth } from './features/auth/authContext'
+import ShowDetails from './pages/ShowDetails/ShowDetails'
 
 function isAuthed() {
   return !!localStorage.getItem("access_token");
@@ -50,6 +51,7 @@ function App() {
             </LoggedInRedirect>}
           />
 
+          <Route path="/shows/:showId" element={<ShowDetails />} />
           <Route path='/account' element={
             <ProtectedRoute>
               <Account />
